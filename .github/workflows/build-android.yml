@@ -27,6 +27,39 @@ jobs:
           cp -a /tmp/project/app .
           cp /tmp/project/settings.gradle.kts /tmp/project/build.gradle.kts /tmp/project/gradle.properties .
           cp /tmp/project/RELEASE_SIGNING.md .
+          
+
+      - name: Add Google code scanner dependency
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          files = [
+              Path("app/build.gradle.kts"),
+              Path("app/build.gradle")
+          ]
+          gradle_file = next(
+              (p for p in files if p.exists()), None
+          )
+
+          if gradle_file is None:
+              raise SystemExit("Gradle-bestand niet gevonden")
+
+          source = gradle_file.read_text()
+          dependency = 'implementation("com.google.android.gms:play-services-code-scanner:16.1.0")'
+
+          if dependency not in source:
+              source, count = re.subn(
+                  r'(?m)^dependencies\s*\{',
+                  lambda m: m.group(0) + "\n    " + dependency,
+                  source,
+                  count=1
+              )
+              if count != 1:
+                  raise SystemExit("Dependencies-blok niet gevonden")
+              gradle_file.write_text(source)
+
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
