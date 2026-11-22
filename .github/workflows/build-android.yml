@@ -22,7 +22,7 @@ jobs:
       
       - name: Unpack Android project
         run: |
-          unzip -q SlimmeBoodschappen-v0.6-source.zip -d /tmp/project
+          unzip -q SlimmeBoodschappen-v0.7-aldi.zip -d /tmp/project
           cp -a /tmp/project/. .
 
       - name: Fix barcode scanner imports
